@@ -17,4 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://Qruby626:$HF_TOKEN@huggingface.co/spaces/Qruby626/flower-classification-cnn-app main
+        run: git push https://Qruby626:$HF_TOKEN@huggingface.co/spaces/Qruby626/flower-classification-app main
