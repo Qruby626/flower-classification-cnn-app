@@ -1,15 +1,8 @@
----
-title: Flower Classification Cnn App
-emoji: 🌸
-colorFrom: pink
-colorTo: red
-sdk: docker
-pinned: false
----
+
 
 # 🌸 Flower Classification System CNN
 
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/Qruby626/flower-classification)
+
 
 Sistem Klasifikasi Jenis Bunga Berbasis Citra Digital Menggunakan CNN dengan Transfer Learning (MobileNetV2).
 

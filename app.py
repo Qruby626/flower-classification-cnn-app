@@ -128,4 +128,7 @@ def clear_history_route():
 if __name__ == '__main__':
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(debug=True)
+    
+    # Run on 0.0.0.0 to be accessible externally, use PORT env var for Railway (default 8080)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port, debug=True)

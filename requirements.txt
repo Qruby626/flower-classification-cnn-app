@@ -6,3 +6,4 @@ Pillow>=10.1.0
 opencv-python-headless>=4.8.0
 matplotlib>=3.8.0
 Werkzeug>=3.0.0
+gunicorn
