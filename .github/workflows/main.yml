@@ -2,6 +2,8 @@ name: Sync to Hugging Face hub
 on:
   push:
     branches: [main]
+
+  # to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -15,4 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://Qruby626:$HF_TOKEN@huggingface.co/spaces/Qruby626/flower-classification-app main
+        run: git push --force https://Qruby626:$HF_TOKEN@huggingface.co/spaces/Qruby626/flower-classification-app main
