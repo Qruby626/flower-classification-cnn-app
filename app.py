@@ -15,6 +15,9 @@ app.secret_key = "flower_secret_key"
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB Rule
 
+# Ensure upload folder exists (Important for production)
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
 # Configure logging
 import logging
 logging.basicConfig(level=logging.INFO)
