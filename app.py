@@ -15,6 +15,11 @@ app.secret_key = "flower_secret_key"
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB Rule
 
+# Configure logging
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 @app.errorhandler(413)
 def handle_file_too_large(e):
     flash('Ukuran file terlalu besar. Maksimum 5MB.')
@@ -49,58 +54,65 @@ def predict():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        # Prediction logic
-        label, confidence, all_probs = predict_flower(filepath)
-        
-        processing_time = time.time() - start_time
-        
-        # Rule: Confidence < 50% rejection (Rule 2 + Out-of-Distribution fix)
-        confidence_pct = float(round(confidence * 100, 2))
-        is_recognized = bool(confidence >= 0.5)
-        
-        display_label = label if is_recognized else "Bukan Bunga / Tidak Dikenali"
-        warning = None
-        
-        if not is_recognized:
-            warning = "Peringatan: Sistem tidak mengenali gambar ini sebagai salah satu dari 5 jenis bunga (Daisy, Dandelion, Rose, Sunflower, Tulip). Sesuai aturan, objek harus berupa bunga yang jelas."
-        elif len(all_probs) > 1 and (all_probs[0]['probability'] - all_probs[1]['probability']) < 0.15:
-            # Ambiguity warning: if the margin between top 2 classes is < 15%
-            warning = f"Catatan: Hasil prediksi cukup berimbang antara {all_probs[0]['class']} dan {all_probs[1]['class']}. Pastikan objek terlihat jelas."
-        
-        # Grad-CAM Heatmap - Only generate if recognized
-        heatmap_path = None
-        if is_recognized and label:
-            model = get_model()
-            img_array = preprocess_image(filepath)
+        try:
+            # Prediction logic
+            logger.info(f"Processing file: {filepath}")
+            label, confidence, all_probs = predict_flower(filepath)
             
-            # Identify last conv layer
-            last_conv_layer_name = None
-            for layer in reversed(model.layers):
-                if 'conv' in layer.name.lower() or 'relu' in layer.name.lower():
-                    last_conv_layer_name = layer.name
-                    break
+            processing_time = time.time() - start_time
             
-            if last_conv_layer_name:
-                heatmap = get_gradcam_heatmap(model, img_array, last_conv_layer_name)
-                if heatmap is not None:
-                    h_filename = "heatmap_" + filename
-                    h_path = os.path.join(app.config['UPLOAD_FOLDER'], h_filename)
-                    heatmap_path = save_and_display_gradcam(filepath, heatmap, h_path)
-                    # Convert to relative path for web
-                    heatmap_path = heatmap_path.replace('\\', '/')
+            # Rule: Confidence < 50% rejection (Rule 2 + Out-of-Distribution fix)
+            confidence_pct = float(round(confidence * 100, 2))
+            is_recognized = bool(confidence >= 0.5)
+            
+            display_label = label if is_recognized else "Bukan Bunga / Tidak Dikenali"
+            warning = None
+            
+            if not is_recognized:
+                warning = "Peringatan: Sistem tidak mengenali gambar ini sebagai salah satu dari 5 jenis bunga (Daisy, Dandelion, Rose, Sunflower, Tulip). Sesuai aturan, objek harus berupa bunga yang jelas."
+            elif len(all_probs) > 1 and (all_probs[0]['probability'] - all_probs[1]['probability']) < 0.15:
+                # Ambiguity warning: if the margin between top 2 classes is < 15%
+                warning = f"Catatan: Hasil prediksi cukup berimbang antara {all_probs[0]['class']} dan {all_probs[1]['class']}. Pastikan objek terlihat jelas."
+            
+            # Grad-CAM Heatmap - Only generate if recognized
+            heatmap_path = None
+            if is_recognized and label:
+                model = get_model()
+                img_array = preprocess_image(filepath)
+                
+                # Identify last conv layer
+                last_conv_layer_name = None
+                for layer in reversed(model.layers):
+                    if 'conv' in layer.name.lower() or 'relu' in layer.name.lower():
+                        last_conv_layer_name = layer.name
+                        break
+                
+                if last_conv_layer_name:
+                    heatmap = get_gradcam_heatmap(model, img_array, last_conv_layer_name)
+                    if heatmap is not None:
+                        h_filename = "heatmap_" + filename
+                        h_path = os.path.join(app.config['UPLOAD_FOLDER'], h_filename)
+                        heatmap_path = save_and_display_gradcam(filepath, heatmap, h_path)
+                        # Convert to relative path for web
+                        heatmap_path = heatmap_path.replace('\\', '/')
 
-        # Save to history
-        add_to_history(filename, display_label, confidence_pct, is_recognized)
+            # Save to history
+            add_to_history(filename, display_label, confidence_pct, is_recognized)
 
-        return render_template('results.html', 
-                               label=display_label, 
-                               confidence=confidence_pct,
-                               is_recognized=is_recognized,
-                               probs=all_probs,
-                               image_path=filepath.replace('\\', '/'),
-                               heatmap_path=heatmap_path,
-                               warning=warning,
-                               processing_time=round(processing_time, 2))
+            return render_template('results.html', 
+                                   label=display_label, 
+                                   confidence=confidence_pct,
+                                   is_recognized=is_recognized,
+                                   probs=all_probs,
+                                   image_path=filepath.replace('\\', '/'),
+                                   heatmap_path=heatmap_path,
+                                   warning=warning,
+                                   processing_time=round(processing_time, 2))
+
+        except Exception as e:
+            logger.error(f"Error during prediction: {str(e)}", exc_info=True)
+            flash(f"Terjadi kesalahan internal: {str(e)}")
+            return redirect(url_for('index'))
     else:
         flash('Format file tidak didukung. Gunakan .jpg, .jpeg, atau .png')
         return redirect(url_for('index'))
