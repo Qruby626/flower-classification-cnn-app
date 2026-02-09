@@ -1,4 +1,7 @@
 import os
+# Force TensorFlow backend for Keras 3
+os.environ["KERAS_BACKEND"] = "tensorflow"
+
 import time
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from werkzeug.utils import secure_filename
