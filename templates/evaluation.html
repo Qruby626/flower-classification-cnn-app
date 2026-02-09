@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluasi Model - Flower Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="glass-container">
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('history_page') }}" class="nav-link">History</a>
+            <a href="{{ url_for('evaluation') }}" class="nav-link">Evaluation</a>
+        </div>
+
+        <h1>Evaluasi Model AI</h1>
+        <p class="subtitle">Metrik performa model pada dataset testing (80% Train, 20% Test)</p>
+
+        <div class="card">
+            <h3>Metrik Utama</h3>
+            <table class="metrics-table">
+                <tr>
+                    <th>Metrik</th>
+                    <th>Skor</th>
+                </tr>
+                <tr>
+                    <td>Accuracy</td>
+                    <td>{{ (metrics.accuracy * 100)|round(2) }}%</td>
+                </tr>
+                <tr>
+                    <td>Precision</td>
+                    <td>{{ (metrics.precision * 100)|round(2) }}%</td>
+                </tr>
+                <tr>
+                    <td>Recall</td>
+                    <td>{{ (metrics.recall * 100)|round(2) }}%</td>
+                </tr>
+                <tr>
+                    <td>F1-score</td>
+                    <td>{{ (metrics.f1_score * 100)|round(2) }}%</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3>Confusion Matrix</h3>
+            <p style="margin-bottom: 15px; color: #636e72;">Visualisasi perbandingan antara prediksi model dan label
+                yang sebenarnya.</p>
+            <div style="text-align: center;">
+                <img src="{{ url_for('static', filename=metrics.confusion_matrix) }}" alt="Confusion Matrix"
+                    class="gradcam-img" style="max-height: 500px; width: auto;">
+                <p style="font-size: 0.8rem; color: #636e72; margin-top: 10px;">(File: {{ metrics.confusion_matrix }})
+                </p>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3>Detail Arsitektur</h3>
+            <p><strong>Base Model:</strong> MobileNetV2 (Pre-trained on ImageNet)</p>
+            <p><strong>Method:</strong> Transfer Learning with Backpropagation</p>
+            <p><strong>Output Layer:</strong> Dense (Softmax)</p>
+            <p><strong>Preprocessing:</strong> 224x224, Normalized [0, 1]</p>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="btn" style="margin-top: 30px;">
+            <i class="fas fa-arrow-left"></i> Kembali ke Home
+        </a>
+
+        <div class="footer">
+            <p>&copy; 2026 Flower Classification System</p>
+        </div>
+    </div>
+</body>
+
+</html>

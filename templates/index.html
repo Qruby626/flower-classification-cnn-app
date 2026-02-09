@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Classifier - CNN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="glass-container">
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('history_page') }}" class="nav-link">History</a>
+            <a href="{{ url_for('evaluation') }}" class="nav-link">Evaluation</a>
+        </div>
+
+        <h1>🌼 Flower Classifier</h1>
+        <p class="subtitle">Klasifikasi jenis bunga otomatis menggunakan deep learning CNN</p>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="warning-box" style="background: rgba(255, 121, 121, 0.2); border-color: #ff7675;">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data" id="upload-form">
+            <div class="upload-section" onclick="document.getElementById('file-input').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Klik atau Drag gambar ke sini</h3>
+                <p>Format yang didukung: JPG, JPEG, PNG (Maks 5MB)</p>
+                <input type="file" name="file" id="file-input" accept="image/*" onchange="previewImage(event)">
+            </div>
+
+            <div class="preview-container" id="preview-container">
+                <img id="image-preview" src="#" alt="Preview Gambar">
+                <br>
+                <button type="submit" class="btn">Identifikasi Bunga</button>
+            </div>
+        </form>
+
+        <div class="footer">
+            <p>&copy; 2026 Flower Classification System - MobileNetV2 Transfer Learning</p>
+        </div>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const output = document.getElementById('image-preview');
+                output.src = reader.result;
+                document.getElementById('preview-container').style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Prediksi - Flower Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="glass-container">
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('history_page') }}" class="nav-link">History</a>
+            <a href="{{ url_for('evaluation') }}" class="nav-link">Evaluation</a>
+        </div>
+
+        <h1>Hasil Klasifikasi</h1>
+
+        {% if warning %}
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i> {{ warning }}
+        </div>
+        {% endif %}
+
+        <div class="results-grid {% if not is_recognized %}unrecognized{% endif %}">
+            <div class="card">
+                <h3>Gambar Input</h3>
+                <img src="{{ url_for('static', filename=image_path.split('static/')[1]) }}" class="gradcam-img"
+                    alt="Input">
+                <p style="margin-top: 10px;">
+                    <strong>Prediksi:</strong>
+                    <span class="prediction-label {% if not is_recognized %}unrecognized{% endif %}">
+                        {{ label }}
+                    </span>
+                </p>
+                <p><strong>Confidence:</strong> {{ confidence }}%</p>
+                <p><strong>Processing Time:</strong> {{ processing_time }}s</p>
+            </div>
+
+            {% if is_recognized and heatmap_path %}
+            <div class="card">
+                <h3>Visualisasi (Grad-CAM)</h3>
+                <img src="{{ url_for('static', filename=heatmap_path.split('static/')[1]) }}" class="gradcam-img"
+                    alt="Heatmap">
+                <p style="margin-top: 10px; font-size: 0.85rem; color: #636e72;">
+                    Area merah menunjukkan fitur yang menjadi fokus model dalam melakukan klasifikasi.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3>Probabilitas Kelas</h3>
+
+            {% for prob in probs %}
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span>{{ prob.class }}</span>
+                <span>{{ (prob.probability * 100)|round(2) }}%</span>
+            </div>
+
+            {% set width_percent = (prob.probability * 100) | round(2) %}
+            <div class="probability-bar">
+                <div class="probability-fill" style="--width: {{ width_percent }}%;"></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <a href="{{ url_for('index') }}" class="btn" style="margin-top: 30px;">
+            <i class="fas fa-redo"></i> Analisis Gambar Lain
+        </a>
+
+        <div class="footer">
+            <p>&copy; 2026 Flower Classification System</p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Flower Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: left;
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .history-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .history-info h4 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .history-info p {
+            margin: 2px 0;
+            font-size: 0.85rem;
+            color: #636e72;
+        }
+
+        .unrecognized-badge {
+            background: #ff7675;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glass-container" style="max-width: 1000px;">
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('history_page') }}" class="nav-link">History</a>
+            <a href="{{ url_for('evaluation') }}" class="nav-link">Evaluation</a>
+        </div>
+
+        <h1>Riwayat Prediksi</h1>
+        <p class="subtitle">Daftar 50 identifikasi bunga terakhir Anda</p>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="warning-box"
+            style="background: rgba(108, 92, 231, 0.1); border-left: 5px solid var(--primary-color);">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% if not history %}
+        <div class="card" style="margin-top: 50px; padding: 60px;">
+            <i class="fas fa-history" style="font-size: 50px; color: #dfe6e9; margin-bottom: 20px;"></i>
+            <p>Belum ada riwayat prediksi.</p>
+            <a href="{{ url_for('index') }}" class="btn" style="margin-top: 20px;">Mulai Identifikasi</a>
+        </div>
+        {% else %}
+        <div class="history-grid">
+            {% for item in history %}
+            <div class="history-item">
+                <img src="{{ url_for('static', filename='uploads/' + item.filename) }}" alt="Flower">
+                <div class="history-info">
+                    <h4>
+                        {% if item.is_recognized %}
+                        {{ item.label }}
+                        {% else %}
+                        <span class="unrecognized-badge">Tidak Dikenali</span>
+                        {% endif %}
+                    </h4>
+                    <p><strong>Confidence:</strong> {{ item.confidence }}%</p>
+                    <p><i class="far fa-clock"></i> {{ item.timestamp }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <form action="{{ url_for('clear_history_route') }}" method="post" style="margin-top: 40px;">
+            <button type="submit" class="btn btn-secondary" onclick="return confirm('Hapus semua riwayat?')">
+                <i class="fas fa-trash"></i> Hapus Semua Riwayat
+            </button>
+        </form>
+        {% endif %}
+
+        <div class="footer">
+            <p>&copy; 2026 Flower Classification System</p>
+        </div>
+    </div>
+</body>
+
+</html>
