@@ -86,9 +86,11 @@ flower-cnn-app/
 - **Dimensi Input Model**: 224x224 piksel
 - **Privasi**: Gambar pengguna tidak disimpan permanen.
 
-## 👥 Kontributor
+## 👥 Author
 
-- [Qruby626](https://github.com/Qruby626)
+- Nama : Thifal Hasna Aulia Habibah
+- NIM : 301220020
+- IF 7A
 
 ---
 *Dikembangkan untuk Tugas Akhir Semester Mata Kuliah Neuro Computing.*
