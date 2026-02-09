@@ -1,3 +1,12 @@
+---
+title: Flower Classification Cnn App
+emoji: 🌸
+colorFrom: pink
+colorTo: red
+sdk: docker
+pinned: false
+---
+
 # 🌸 Flower Classification System CNN
 
 Sistem Klasifikasi Jenis Bunga Berbasis Citra Digital Menggunakan CNN dengan Transfer Learning (MobileNetV2).
